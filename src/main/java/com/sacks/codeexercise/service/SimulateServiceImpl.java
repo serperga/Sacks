@@ -1,5 +1,9 @@
 package com.sacks.codeexercise.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +18,17 @@ public class SimulateServiceImpl implements SimulateService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
 
+    private final int NUMBER_OF_CUSTOMERS = 200;
+    private final int NUMBER_OF_PRODUCTS = 20;
+
+    private final int MINIMUM_QUANTITY_OF_PRODUCT = 1;
+    private final int MAXIMUM_QUANTITY_OF_PRODUCT = 100;
+
+    private final double MINIMUM_PRODUCT_PRICE = 1.0;
+    private final double MAXIMUM_PRODUCT_PRICE = 200.0;
+
+    private final double MINIMUM_AMOUNT_IN_CUSTOMER_WALLET = 100.0;
+    private final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
     @Autowired
     public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository){
         this.customerRepository = customerRepository;
@@ -22,22 +37,65 @@ public class SimulateServiceImpl implements SimulateService {
 
     @Override
     public void simulateSystem() {
-        for (int i = 0; i < 200; i++) {
+        createCustomersInDatabase();
+        createProductsInDatabase();
+    }
+
+    private void createCustomersInDatabase(){
+        for (int i = 0; i < NUMBER_OF_CUSTOMERS; i++) {
+            double amountInWallet = generateRandomAmountOfMoneyInCustomerWallet(MINIMUM_AMOUNT_IN_CUSTOMER_WALLET,MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET);
+
             Customer customer = new Customer();
             customer.setUsername("user"+i);
-            customer.setInitialAmountInWallet(200.0);
-            customer.setCurrentAmountInWallet(200.0);
+            customer.setInitialAmountInWallet(amountInWallet);
+            customer.setCurrentAmountInWallet(amountInWallet);
 
             customer = customerRepository.save(customer);
         }
+    }
 
-        for (int i = 0; i < 20; i++) {
+    private void createProductsInDatabase(){
+        for (int i = 0; i < NUMBER_OF_PRODUCTS; i++) {
+
+            int productQuantity = generateRandomNumberOfProducts(MINIMUM_QUANTITY_OF_PRODUCT,MAXIMUM_QUANTITY_OF_PRODUCT);
+            double price = generateRandomPriceForProduct(MINIMUM_PRODUCT_PRICE,MAXIMUM_PRODUCT_PRICE);
+
             Product product = new Product();
             product.setName("Product" + i);
-            product.setQuantity(15);
-            product.setPrice(100.0);
+            product.setQuantity(productQuantity);
+            product.setPrice(price);
 
             product = productRepository.save(product);
         }
+    }
+
+    private int generateRandomNumberOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){
+        Random r = new Random();
+        int low = minimumQuantityOfProduct;
+        int high = maximumQuantityOfProduct;
+        int result = r.nextInt(high-low) + low;
+
+        return result;
+    }
+
+    private double generateRandomPriceForProduct(double minimumPrice, double maximumPrice){
+        double price = generateRandomDoubleValueWithTwoDecimalsRounded(minimumPrice,maximumPrice);
+        return price;
+    }
+
+    private double generateRandomAmountOfMoneyInCustomerWallet(double minimumAmountInWallet, double maximumAmountInWallet){
+        double amountInWallet = generateRandomDoubleValueWithTwoDecimalsRounded(minimumAmountInWallet,maximumAmountInWallet);
+        return amountInWallet;
+    }
+
+    private double generateRandomDoubleValueWithTwoDecimalsRounded(double minRange,double maxRange){
+
+        Random random = new Random();
+        double min = minRange;
+        double max = maxRange;
+        double randomValue = new Random().doubles(min, max).limit(1).findFirst().getAsDouble();
+
+        BigDecimal doubleValue = new BigDecimal(randomValue).setScale(2, RoundingMode.HALF_EVEN);
+        return doubleValue.doubleValue();
     }
 }

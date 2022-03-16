@@ -1,28 +1,29 @@
 package com.sacks.codeexercise.model.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-/**
- * @author Sergio Perez Gago <sergio.perez01@globant.com>
- */
 @Entity
 @Table(name = "buyers")
-public class Buyers {
+public class Customer {
 
     @Id
     private String username;
     private Double currentAmountInWallet;
     private Double initialAmountInWallet;
 
-    public Buyers(){}
+    @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL)
+    private List<Order> orders = new ArrayList<>();
 
-    public Buyers(String username, Double currentAmountInWallet, Double initialAmountInWallet) {
-        this.username = username;
-        this.currentAmountInWallet = currentAmountInWallet;
-        this.initialAmountInWallet = initialAmountInWallet;
-    }
+    public Customer(){}
 
     public String getUsername() {
         return username;
@@ -46,5 +47,13 @@ public class Buyers {
 
     public void setInitialAmountInWallet(Double initialAmountInWallet) {
         this.initialAmountInWallet = initialAmountInWallet;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }

@@ -1,15 +1,7 @@
 package com.sacks.codeexercise;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import com.sacks.codeexercise.model.entities.Buyers;
-import com.sacks.codeexercise.repository.BuyerRepository;
 
 @SpringBootApplication
 public class CodeexerciseApplication {
@@ -18,15 +10,28 @@ public class CodeexerciseApplication {
 		SpringApplication.run(CodeexerciseApplication.class, args);
 	}
 
-	@Bean
-	public CommandLineRunner demo(BuyerRepository repository) {
+/*	@Bean
+	public CommandLineRunner demo(CustomerRepository customerRepository, OrdersRepository ordersRepository) {
 		return (args) -> {
-			List buyerList = new ArrayList();
 			for (int i = 0; i < 200; i++) {
-				Buyers buyer = new Buyers("example" + i, 200.0, 200.0);
-				buyerList.add(buyer);
+				List ordersList = new ArrayList();
+				Customer customer = new Customer();
+				customer.setUsername("user"+i);
+				customer.setInitialAmountInWallet(200.0);
+				customer.setCurrentAmountInWallet(200.0);
+
+				Order customerOrder = new Order();
+				customerOrder.setAmount(200.0);
+				customerOrder.setStatus("Created");
+				customerOrder.setEstimatedDays(1);
+
+				ordersList.add(customerOrder);
+				customerOrder.setBuyer(customer);
+
+				customer.setOrders(ordersList);
+				customer = customerRepository.save(customer);
+
 			}
-			repository.saveAll(buyerList);
 		};
-	}
+	}*/
 }

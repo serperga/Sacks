@@ -1,10 +1,9 @@
 package com.sacks.codeexercise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sacks.codeexercise.repository.CustomerRepository;
 import com.sacks.codeexercise.service.SimulateService;
 
 @RestController
@@ -17,8 +16,8 @@ public class SimulateController {
         this.simulateService = simulateService;
     }
 
-    @GetMapping("/simulate")
-    public String getMessage() {
+    @PostMapping("/simulate")
+    public String simulateSystemCreation() {
         simulateService.simulateSystem();
         return "Hello from Docker!";
     }

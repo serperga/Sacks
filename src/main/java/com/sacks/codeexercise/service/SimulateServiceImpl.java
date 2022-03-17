@@ -3,14 +3,17 @@ package com.sacks.codeexercise.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sacks.codeexercise.model.entities.Customer;
 import com.sacks.codeexercise.model.entities.OrderStatus;
+import com.sacks.codeexercise.model.entities.OrderStatusHistory;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.CustomerRepository;
 import com.sacks.codeexercise.repository.OrderStatusRepository;
@@ -80,6 +83,8 @@ public class SimulateServiceImpl implements SimulateService {
     private void createOrderStatusInDatabase(){
 
         List<OrderStatus> orderStatuses = new ArrayList<>();
+
+        Set<OrderStatusHistory> orderStatusHistorySet = new HashSet<>();
 
         OrderStatus statusOrdered = new OrderStatus(0,"Ordered");
         orderStatuses.add(statusOrdered);

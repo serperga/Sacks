@@ -19,32 +19,37 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
-    private String status;
+    private long orderId;
     private int estimatedDays;
     private Double amount;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "username", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Customer buyer;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "status_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private OrderStatus orderStatus;
+
     public Order(){}
 
-    public long getId() {
-        return id;
+    public Order(long orderId, int estimatedDays, Double amount, Customer buyer) {
+        this.orderId = orderId;
+        this.estimatedDays = estimatedDays;
+        this.amount = amount;
+        this.buyer = buyer;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public long getOrderId() {
+        return orderId;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
 
     public int getEstimatedDays() {

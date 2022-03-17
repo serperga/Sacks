@@ -2,14 +2,18 @@ package com.sacks.codeexercise.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sacks.codeexercise.model.entities.Customer;
+import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.CustomerRepository;
+import com.sacks.codeexercise.repository.OrderStatusRepository;
 import com.sacks.codeexercise.repository.ProductRepository;
 
 @Service
@@ -17,6 +21,7 @@ public class SimulateServiceImpl implements SimulateService {
 
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final OrderStatusRepository orderStatusRepository;
 
     private final int NUMBER_OF_CUSTOMERS = 200;
     private final int NUMBER_OF_PRODUCTS = 20;
@@ -29,16 +34,19 @@ public class SimulateServiceImpl implements SimulateService {
 
     private final double MINIMUM_AMOUNT_IN_CUSTOMER_WALLET = 100.0;
     private final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
+
     @Autowired
-    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository){
+    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository){
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
+        this.orderStatusRepository = orderStatusRepository;
     }
 
     @Override
     public void simulateSystem() {
         createCustomersInDatabase();
         createProductsInDatabase();
+        createOrderStatusInDatabase();
     }
 
     private void createCustomersInDatabase(){
@@ -67,6 +75,29 @@ public class SimulateServiceImpl implements SimulateService {
 
             product = productRepository.save(product);
         }
+    }
+
+    private void createOrderStatusInDatabase(){
+
+        List<OrderStatus> orderStatuses = new ArrayList<>();
+
+        OrderStatus statusOrdered = new OrderStatus(0,"Ordered");
+        orderStatuses.add(statusOrdered);
+        OrderStatus statusSentToWarehouse = new OrderStatus(1,"Sent to Warehouse");
+        orderStatuses.add(statusSentToWarehouse);
+        OrderStatus statusPackaged = new OrderStatus(2,"Packaged");
+        orderStatuses.add(statusPackaged);
+        OrderStatus statusPickedUp = new OrderStatus(3,"Carrier picked up");
+        orderStatuses.add(statusPickedUp);
+        OrderStatus statusOutForDelivery = new OrderStatus(4,"Out for delivery");
+        orderStatuses.add(statusOutForDelivery);
+        OrderStatus statusDelivered = new OrderStatus(5,"Delivered");
+        orderStatuses.add(statusDelivered);
+        OrderStatus statusCancelled = new OrderStatus(6,"Cancelled");
+        orderStatuses.add(statusCancelled);
+
+        orderStatusRepository.saveAll(orderStatuses);
+
     }
 
     private int generateRandomNumberOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){

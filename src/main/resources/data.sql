@@ -23,3 +23,8 @@ CREATE TABLE products (
   quantity INT NOT NULL,
   price DECIMAL NOT NULL
 );
+
+CREATE TABLE order_status (
+  id INT PRIMARY KEY,
+  name VARCHAR(250) NOT NULL
+);

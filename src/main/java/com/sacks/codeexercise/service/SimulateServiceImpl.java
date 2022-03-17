@@ -23,17 +23,17 @@ public class SimulateServiceImpl implements SimulateService {
     private final ProductRepository productRepository;
     private final OrderStatusRepository orderStatusRepository;
 
-    private final int NUMBER_OF_CUSTOMERS = 200;
-    private final int NUMBER_OF_PRODUCTS = 20;
+    private static final int NUMBER_OF_CUSTOMERS = 200;
+    private static final int NUMBER_OF_PRODUCTS = 20;
 
-    private final int MINIMUM_QUANTITY_OF_PRODUCT = 1;
-    private final int MAXIMUM_QUANTITY_OF_PRODUCT = 100;
+    private static final int MINIMUM_QUANTITY_OF_PRODUCT = 1;
+    private static final int MAXIMUM_QUANTITY_OF_PRODUCT = 100;
 
-    private final double MINIMUM_PRODUCT_PRICE = 1.0;
-    private final double MAXIMUM_PRODUCT_PRICE = 200.0;
+    private static final double MINIMUM_PRODUCT_PRICE = 1.0;
+    private static final double MAXIMUM_PRODUCT_PRICE = 200.0;
 
-    private final double MINIMUM_AMOUNT_IN_CUSTOMER_WALLET = 100.0;
-    private final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
+    private static final double MINIMUM_AMOUNT_IN_CUSTOMER_WALLET = 100.0;
+    private static final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
 
     @Autowired
     public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository){
@@ -102,9 +102,7 @@ public class SimulateServiceImpl implements SimulateService {
 
     private int generateRandomNumberOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){
         Random r = new Random();
-        int low = minimumQuantityOfProduct;
-        int high = maximumQuantityOfProduct;
-        int result = r.nextInt(high-low) + low;
+        int result = r.nextInt(maximumQuantityOfProduct-minimumQuantityOfProduct) + minimumQuantityOfProduct;
 
         return result;
     }
@@ -121,10 +119,7 @@ public class SimulateServiceImpl implements SimulateService {
 
     private double generateRandomDoubleValueWithTwoDecimalsRounded(double minRange,double maxRange){
 
-        Random random = new Random();
-        double min = minRange;
-        double max = maxRange;
-        double randomValue = new Random().doubles(min, max).limit(1).findFirst().getAsDouble();
+        double randomValue = new Random().doubles(minRange, maxRange).limit(1).findFirst().getAsDouble();
 
         BigDecimal doubleValue = new BigDecimal(randomValue).setScale(2, RoundingMode.HALF_EVEN);
         return doubleValue.doubleValue();

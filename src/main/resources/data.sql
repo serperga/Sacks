@@ -28,3 +28,10 @@ CREATE TABLE order_status (
   id INT PRIMARY KEY,
   name VARCHAR(250) NOT NULL
 );
+
+CREATE TABLE order_history (
+  order_id INT NOT NULL,
+  order_status INT NOT NULL,
+  order_status_completed_in_days INT NOT NULL,
+  PRIMARY KEY (order_id, order_status)
+);

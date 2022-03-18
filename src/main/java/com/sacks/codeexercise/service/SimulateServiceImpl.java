@@ -7,11 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sacks.codeexercise.model.entities.Customer;
+import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.OrderStatusHistory;
 import com.sacks.codeexercise.model.entities.Product;
@@ -30,13 +32,19 @@ public class SimulateServiceImpl implements SimulateService {
     private static final int NUMBER_OF_PRODUCTS = 20;
 
     private static final int MINIMUM_QUANTITY_OF_PRODUCT = 1;
-    private static final int MAXIMUM_QUANTITY_OF_PRODUCT = 100;
+    private static final int MAXIMUM_QUANTITY_OF_PRODUCT = 300;
 
     private static final double MINIMUM_PRODUCT_PRICE = 1.0;
     private static final double MAXIMUM_PRODUCT_PRICE = 200.0;
 
     private static final double MINIMUM_AMOUNT_IN_CUSTOMER_WALLET = 100.0;
     private static final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
+
+    private static final int MINIMUM_NUMBER_OF_PRODUCT = 1;
+    private static final int MAXIMUM_NUMBER_OF_PRODUCT = 5;
+
+    private static final int MINIMUM_PRODUCT_ID = 1;
+    private static final int MAXIMUM_PRODUCT_ID = 20;
 
     @Autowired
     public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository){
@@ -48,8 +56,9 @@ public class SimulateServiceImpl implements SimulateService {
     @Override
     public void simulateSystem() {
         createCustomersInDatabase();
-        createProductsInDatabase();
-        createOrderStatusInDatabase();
+        List<Product> productList = createProductsInDatabase();
+        List<OrderStatus> orderStatusList = createOrderStatusInDatabase();
+        createOrdersInDatabase(productList, orderStatusList);
     }
 
     private void createCustomersInDatabase(){
@@ -62,13 +71,15 @@ public class SimulateServiceImpl implements SimulateService {
             customer.setCurrentAmountInWallet(amountInWallet);
 
             customer = customerRepository.save(customer);
+
         }
     }
 
-    private void createProductsInDatabase(){
+    private List<Product> createProductsInDatabase(){
+        List<Product> productList = new ArrayList<>();
         for (int i = 0; i < NUMBER_OF_PRODUCTS; i++) {
 
-            int productQuantity = generateRandomNumberOfProducts(MINIMUM_QUANTITY_OF_PRODUCT,MAXIMUM_QUANTITY_OF_PRODUCT);
+            int productQuantity = generateRandomQuantityOfProducts(MINIMUM_QUANTITY_OF_PRODUCT,MAXIMUM_QUANTITY_OF_PRODUCT);
             double price = generateRandomPriceForProduct(MINIMUM_PRODUCT_PRICE,MAXIMUM_PRODUCT_PRICE);
 
             Product product = new Product();
@@ -76,11 +87,13 @@ public class SimulateServiceImpl implements SimulateService {
             product.setQuantity(productQuantity);
             product.setPrice(price);
 
+            productList.add(product);
             product = productRepository.save(product);
         }
+        return productList;
     }
 
-    private void createOrderStatusInDatabase(){
+    private List<OrderStatus> createOrderStatusInDatabase(){
 
         List<OrderStatus> orderStatuses = new ArrayList<>();
 
@@ -102,13 +115,60 @@ public class SimulateServiceImpl implements SimulateService {
         orderStatuses.add(statusCancelled);
 
         orderStatusRepository.saveAll(orderStatuses);
+        return orderStatuses;
+    }
+
+    private void createOrdersInDatabase(List<Product> productList,
+        List<OrderStatus> orderStatusList){
+        Order customerOrder = new Order();
+
+        int numberOfStatusEstimatedDays = generateRandomIntNumber(1,5);
+        customerOrder.setEstimatedDays(numberOfStatusEstimatedDays);
+
+        int numberOfProducts = generateRandomNumberOfProducts(MINIMUM_NUMBER_OF_PRODUCT,MAXIMUM_NUMBER_OF_PRODUCT);
+
+        List<Product> orderProductList = new ArrayList<>();
+        for (int j =0; j < numberOfProducts; j++){
+            int productId = generateRandomProduct(MINIMUM_PRODUCT_ID,MAXIMUM_PRODUCT_ID);
+            int productListIndex = productId -1;
+            Product productOrdered = productList.get(productListIndex);
+            orderProductList.add(productOrdered);
+        }
+
+        //Check if there is enough quantity of products
+        boolean productsWithStock = true;
+        int productIndex = 0;
+        while(productsWithStock && productIndex<orderProductList.size()){
+            Product product = orderProductList.get(productIndex);
+            int productQuantity = product.getQuantity();
+            if (productQuantity == 0){
+                productsWithStock = false;
+            }
+            productIndex++;
+        }
+        //If there is enough products in stocks, update the quantity
+        orderProductList.forEach(product -> product.setQuantity(product.getQuantity()-1));
+        //save to Database
+        productRepository.saveAll(orderProductList);
+
+        Double sum = orderProductList.stream()
+            .collect(Collectors.summingDouble(Product::getPrice));
+
 
     }
 
-    private int generateRandomNumberOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){
-        Random r = new Random();
-        int result = r.nextInt(maximumQuantityOfProduct-minimumQuantityOfProduct) + minimumQuantityOfProduct;
+    private int generateRandomQuantityOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){
+        int result = generateRandomIntNumber(minimumQuantityOfProduct,maximumQuantityOfProduct);
+        return result;
+    }
 
+    private int generateRandomNumberOfProducts(int minimumNumberOfProducts, int maximumNumberOfProduct){
+        int result = generateRandomIntNumber(minimumNumberOfProducts,maximumNumberOfProduct);
+        return result;
+    }
+
+    private int generateRandomProduct(int minimumProduct, int maximumProduct){
+        int result = generateRandomIntNumber(minimumProduct,maximumProduct);
         return result;
     }
 
@@ -128,5 +188,12 @@ public class SimulateServiceImpl implements SimulateService {
 
         BigDecimal doubleValue = new BigDecimal(randomValue).setScale(2, RoundingMode.HALF_EVEN);
         return doubleValue.doubleValue();
+    }
+
+    private int generateRandomIntNumber(int minRange,int maxRange){
+        Random r = new Random();
+        int result = r.nextInt(maxRange-minRange) + minRange;
+
+        return result;
     }
 }

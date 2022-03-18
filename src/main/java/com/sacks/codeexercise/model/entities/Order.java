@@ -1,11 +1,17 @@
 package com.sacks.codeexercise.model.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -34,6 +40,14 @@ public class Order {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private OrderStatus orderStatus;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "order_products",
+        joinColumns = {
+            @JoinColumn(name = "order_id", nullable = false, updatable = false)},
+        inverseJoinColumns = {
+            @JoinColumn(name = "product_id", nullable = false, updatable = false)})
+    private Set<Product> products = new HashSet<>();
 
     public Order(){}
 
@@ -74,5 +88,21 @@ public class Order {
 
     public void setBuyer(Customer buyer) {
         this.buyer = buyer;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 }

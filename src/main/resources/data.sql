@@ -8,7 +8,6 @@ CREATE TABLE buyers (
   current_amount_in_wallet DECIMAL NOT NULL,
   initial_amount_in_wallet DECIMAL NOT NULL,
   username VARCHAR(250) NOT NULL PRIMARY KEY
-
 );
 
 CREATE TABLE orders (
@@ -20,7 +19,7 @@ CREATE TABLE orders (
 );
 
 CREATE TABLE products (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(250) NOT NULL,
   quantity INT NOT NULL,
   price DECIMAL NOT NULL
@@ -38,3 +37,10 @@ CREATE TABLE order_status_history (
   username VARCHAR(250) NOT NULL,
   PRIMARY KEY (order_id, status_id)
 );
+
+CREATE TABLE order_products (
+  product_id INT,
+  order_id INT,
+  PRIMARY KEY (order_id, product_id)
+);
+

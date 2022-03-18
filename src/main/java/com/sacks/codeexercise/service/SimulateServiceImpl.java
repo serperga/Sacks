@@ -18,7 +18,9 @@ import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.OrderStatusHistory;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.CustomerRepository;
+import com.sacks.codeexercise.repository.OrderStatusHistoryRepository;
 import com.sacks.codeexercise.repository.OrderStatusRepository;
+import com.sacks.codeexercise.repository.OrdersRepository;
 import com.sacks.codeexercise.repository.ProductRepository;
 
 @Service
@@ -27,6 +29,8 @@ public class SimulateServiceImpl implements SimulateService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderStatusRepository orderStatusRepository;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final OrdersRepository orderRepository;
 
     private static final int NUMBER_OF_CUSTOMERS = 200;
     private static final int NUMBER_OF_PRODUCTS = 20;
@@ -46,22 +50,31 @@ public class SimulateServiceImpl implements SimulateService {
     private static final int MINIMUM_PRODUCT_ID = 1;
     private static final int MAXIMUM_PRODUCT_ID = 20;
 
+    private static final int ORDER_CREATED_STATUS = 0;
+    private static final int CANCELLED_STATUS_NOT_ENOUGH_STOCK = 6;
+    private static final int CANCELLED_STATUS_NOT_ENOUGH_MONEY_IN_CUSTOMER_WALLET = 7;
+
     @Autowired
-    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository){
+    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository,OrderStatusHistoryRepository orderStatusHistoryRepository,OrdersRepository orderRepository){
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderStatusRepository = orderStatusRepository;
+        this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Override
     public void simulateSystem() {
-        createCustomersInDatabase();
-        List<Product> productList = createProductsInDatabase();
-        List<OrderStatus> orderStatusList = createOrderStatusInDatabase();
-        createOrdersInDatabase(productList, orderStatusList);
+        List<Customer> customers = createCustomersInDatabase();
+        List<Product> products = createProductsInDatabase();
+        List<OrderStatus> orderStatuses = createOrderStatusInDatabase();
+        createOrdersInDatabase(products, orderStatuses, customers);
     }
 
-    private void createCustomersInDatabase(){
+    private List<Customer> createCustomersInDatabase(){
+
+        List<Customer> customers = new ArrayList<>();
+
         for (int i = 0; i < NUMBER_OF_CUSTOMERS; i++) {
             double amountInWallet = generateRandomAmountOfMoneyInCustomerWallet(MINIMUM_AMOUNT_IN_CUSTOMER_WALLET,MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET);
 
@@ -71,8 +84,10 @@ public class SimulateServiceImpl implements SimulateService {
             customer.setCurrentAmountInWallet(amountInWallet);
 
             customer = customerRepository.save(customer);
-
+            customers.add(customer);
         }
+
+        return customers;
     }
 
     private List<Product> createProductsInDatabase(){
@@ -111,50 +126,99 @@ public class SimulateServiceImpl implements SimulateService {
         orderStatuses.add(statusOutForDelivery);
         OrderStatus statusDelivered = new OrderStatus(5,"Delivered");
         orderStatuses.add(statusDelivered);
-        OrderStatus statusCancelled = new OrderStatus(6,"Cancelled");
-        orderStatuses.add(statusCancelled);
+        OrderStatus statusCancelledNotEnoughInventory = new OrderStatus(6,"Cancelled. Not Enough stock");
+        orderStatuses.add(statusCancelledNotEnoughInventory);
+        OrderStatus statusCancelledNotEnoughMoneyInCustomerWallet = new OrderStatus(7,"Cancelled. Not Enough money in customer wallet");
+        orderStatuses.add(statusCancelledNotEnoughMoneyInCustomerWallet);
 
         orderStatusRepository.saveAll(orderStatuses);
         return orderStatuses;
     }
 
     private void createOrdersInDatabase(List<Product> productList,
-        List<OrderStatus> orderStatusList){
-        Order customerOrder = new Order();
+        List<OrderStatus> orderStatusList, List<Customer> customers){
 
-        int numberOfStatusEstimatedDays = generateRandomIntNumber(1,5);
-        customerOrder.setEstimatedDays(numberOfStatusEstimatedDays);
+        customers.forEach(customer -> {
+            int estimatedDaysForStatusToBeCompleted = generateRandomIntNumber(1,5);
 
-        int numberOfProducts = generateRandomNumberOfProducts(MINIMUM_NUMBER_OF_PRODUCT,MAXIMUM_NUMBER_OF_PRODUCT);
+            int numberOfProducts = generateRandomNumberOfProducts(MINIMUM_NUMBER_OF_PRODUCT,MAXIMUM_NUMBER_OF_PRODUCT);
 
-        List<Product> orderProductList = new ArrayList<>();
-        for (int j =0; j < numberOfProducts; j++){
-            int productId = generateRandomProduct(MINIMUM_PRODUCT_ID,MAXIMUM_PRODUCT_ID);
-            int productListIndex = productId -1;
-            Product productOrdered = productList.get(productListIndex);
-            orderProductList.add(productOrdered);
-        }
-
-        //Check if there is enough quantity of products
-        boolean productsWithStock = true;
-        int productIndex = 0;
-        while(productsWithStock && productIndex<orderProductList.size()){
-            Product product = orderProductList.get(productIndex);
-            int productQuantity = product.getQuantity();
-            if (productQuantity == 0){
-                productsWithStock = false;
+            List<Product> orderProductList = new ArrayList<>();
+            for (int j =0; j < numberOfProducts; j++){
+                int productId = generateRandomProduct(MINIMUM_PRODUCT_ID,MAXIMUM_PRODUCT_ID);
+                int productListIndex = productId -1;
+                Product productOrdered = productList.get(productListIndex);
+                orderProductList.add(productOrdered);
             }
-            productIndex++;
-        }
-        //If there is enough products in stocks, update the quantity
-        orderProductList.forEach(product -> product.setQuantity(product.getQuantity()-1));
-        //save to Database
-        productRepository.saveAll(orderProductList);
 
-        Double sum = orderProductList.stream()
-            .collect(Collectors.summingDouble(Product::getPrice));
+            //Check if there is enough quantity of products
+            boolean productsWithStock = true;
+            int productIndex = 0;
+            while(productsWithStock && productIndex<orderProductList.size()){
+                Product product = orderProductList.get(productIndex);
+                int productQuantity = product.getQuantity();
+                if (productQuantity == 0){
+                    productsWithStock = false;
+                }
+                productIndex++;
+            }
+            if (productsWithStock) {
+                //If there is enough products in stocks, update the quantity
+                orderProductList.forEach(product -> product.setQuantity(product.getQuantity() - 1));
+                productRepository.saveAll(orderProductList);
+                //Calculate OrderAmount
+                Double orderAmount = orderProductList.stream()
+                    .collect(Collectors.summingDouble(Product::getPrice));
+                //Check if the customer wallet has enough money
+                Double customerWallet = customer.getCurrentAmountInWallet();
+                if (customerWallet > orderAmount){
+                    OrderStatus orderStatus = orderStatusList.get(ORDER_CREATED_STATUS);
+                    Order order = createOrder(customer,orderStatus,orderProductList,orderAmount,estimatedDaysForStatusToBeCompleted);
+                    order = orderRepository.save(order);
+                    double customerWalletAmountAfterOrderCreated = customerWallet - orderAmount;
+                    customer.setCurrentAmountInWallet(customerWalletAmountAfterOrderCreated);
+                    customerRepository.save(customer);
+                } else {
+                    //Create cancelled order with no enough money status
+                    OrderStatus cancelledStatus = orderStatusList.get(CANCELLED_STATUS_NOT_ENOUGH_MONEY_IN_CUSTOMER_WALLET);
+                    Order cancelledOrder = createOrder(customer,cancelledStatus,orderProductList,null,0);
+                    cancelledOrder = orderRepository.save(cancelledOrder);
+                    OrderStatusHistory orderCancelledToOrdersHistory = moveClosedOrderToOrderHistory(cancelledOrder,CANCELLED_STATUS_NOT_ENOUGH_MONEY_IN_CUSTOMER_WALLET);
+                }
+            } else {
+                //Create cancelled order with no stock status
+                OrderStatus cancelledStatus = orderStatusList.get(CANCELLED_STATUS_NOT_ENOUGH_STOCK);
+                Order cancelledOrder = createOrder(customer,cancelledStatus,orderProductList,null,0);
+                cancelledOrder = orderRepository.save(cancelledOrder);
+                OrderStatusHistory orderCancelledToOrdersHistory = moveClosedOrderToOrderHistory(cancelledOrder,CANCELLED_STATUS_NOT_ENOUGH_STOCK);
+            }
+        });
+    }
 
+    private Order createOrder(Customer customer, OrderStatus status, List<Product> products, Double orderAmount, int daysToCompleteState){
+        Order order = new Order();
+        order.setBuyer(customer);
+        order.setOrderStatus(status);
+        order.setProducts(products);
+        order.setAmount(orderAmount);
+        order.setEstimatedDays(daysToCompleteState);
+        order = orderRepository.save(order);
 
+        return order;
+    }
+
+    private OrderStatusHistory moveClosedOrderToOrderHistory(Order orderToClose,int status){
+        OrderStatusHistory order = new OrderStatusHistory();
+        order.setOrderId(orderToClose.getOrderId());
+        order.setUsername(orderToClose.getBuyer().getUsername());
+        order.setStatusId(status);
+        order.setCompletedStatusInDays(0);
+        order = orderStatusHistoryRepository.save(order);
+
+        //remove order from Orders Table
+        orderRepository.delete(orderToClose);
+
+        return order;
     }
 
     private int generateRandomQuantityOfProducts(int minimumQuantityOfProduct, int maximumQuantityOfProduct){

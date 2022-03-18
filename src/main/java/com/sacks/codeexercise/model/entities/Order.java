@@ -1,7 +1,7 @@
 package com.sacks.codeexercise.model.entities;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,7 +25,12 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "seq_customer")
+    @SequenceGenerator(
+        name = "seq_customer",
+        allocationSize = 1
+    )
     private long orderId;
     private int estimatedDays;
     private Double amount;
@@ -47,7 +53,7 @@ public class Order {
             @JoinColumn(name = "order_id", nullable = false, updatable = false)},
         inverseJoinColumns = {
             @JoinColumn(name = "product_id", nullable = false, updatable = false)})
-    private Set<Product> products = new HashSet<>();
+    private List<Product> products = new ArrayList<>();
 
     public Order(){}
 
@@ -98,11 +104,11 @@ public class Order {
         this.orderStatus = orderStatus;
     }
 
-    public Set<Product> getProducts() {
+    public List<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(Set<Product> products) {
+    public void setProducts(List<Product> products) {
         this.products = products;
     }
 }

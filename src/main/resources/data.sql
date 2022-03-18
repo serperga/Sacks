@@ -13,8 +13,8 @@ CREATE TABLE buyers (
 CREATE TABLE orders (
   order_id INT AUTO_INCREMENT PRIMARY KEY,
   status_id INT NOT NULL,
-  estimated_days INT NOT NULL,
-  amount DECIMAL NOT NULL,
+  estimated_days INT,
+  amount DECIMAL,
   username VARCHAR(250) NOT NULL
 );
 
@@ -31,9 +31,9 @@ CREATE TABLE order_status (
 );
 
 CREATE TABLE order_status_history (
-  order_id INT AUTO_INCREMENT,
+  order_id INT NOT NULL,
   status_id INT NOT NULL,
-  completed_status_in_days INT NOT NULL,
+  completed_status_in_days INT,
   username VARCHAR(250) NOT NULL,
   PRIMARY KEY (order_id, status_id)
 );

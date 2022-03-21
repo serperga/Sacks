@@ -1,16 +1,19 @@
 package com.sacks.codeexercise.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sacks.codeexercise.error.IncorrectUpdateStatusException;
 import com.sacks.codeexercise.error.NotFoundOrderErrorException;
+import com.sacks.codeexercise.model.OrderUpdateInformation;
 import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.OrderStatusHistory;
-import com.sacks.codeexercise.model.entities.OrderUpdateInformation;
 import com.sacks.codeexercise.repository.OrderStatusHistoryRepository;
 import com.sacks.codeexercise.repository.OrderStatusRepository;
 import com.sacks.codeexercise.repository.OrdersRepository;
@@ -60,6 +63,7 @@ public class UpdateOrderServiceImpl implements UpdateOrderService {
             }else{
                 OrderStatusHistory orderStatusHistory = createOrderStatusHistory(orderToUpdate);
                 orderStatusHistoryRepository.save(orderStatusHistory);
+                int estimatedProcessDaysForNewStatus = generateRandomIntNumber(1,5);
 
                 if(statusToUpdateOrder == ORDER_DELIVERED_STATUS){
                     orderStatusHistory.setStatusId(ORDER_DELIVERED_STATUS);
@@ -67,7 +71,9 @@ public class UpdateOrderServiceImpl implements UpdateOrderService {
                     orderStatusHistoryRepository.save(orderStatusHistory);
                     orderRepository.delete(orderToUpdate);
                 } else {
-                    orderToUpdate.setOrderStatus(orderStatusToUpdate.get());
+                    OrderStatus orderStatus = orderStatusToUpdate.get();
+                    orderToUpdate.setOrderStatus(orderStatus);
+                    orderUpdated.setEstimatedDays(estimatedProcessDaysForNewStatus);
                     orderUpdated = orderRepository.save(orderToUpdate);
                 }
 
@@ -94,5 +100,12 @@ public class UpdateOrderServiceImpl implements UpdateOrderService {
         orderStatusHistory.setCompletedStatusInDays(order.getEstimatedDays());
 
         return orderStatusHistory;
+    }
+
+    private int generateRandomIntNumber(int minRange,int maxRange){
+        Random r = new Random();
+        int result = r.nextInt(maxRange-minRange) + minRange;
+
+        return result;
     }
 }

@@ -1,4 +1,4 @@
-package com.sacks.codeexercise.model.entities;
+package com.sacks.codeexercise.model;
 
 import java.io.Serializable;
 import java.util.Optional;

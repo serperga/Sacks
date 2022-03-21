@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sacks.codeexercise.error.WrongParameterException;
-import com.sacks.codeexercise.model.entities.OrderUpdateInformation;
+import com.sacks.codeexercise.model.OrderUpdateInformation;
+import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.service.UpdateOrderService;
 import io.swagger.annotations.Api;
 
@@ -28,11 +29,20 @@ public class UpdateOrderController {
     }
 
     @PutMapping("/orders/{orderId}")
-    public ResponseEntity<String> updateOrder(@PathVariable("orderId") long id,@RequestBody OrderUpdateInformation orderUpdateInformation){
+    public ResponseEntity<com.sacks.codeexercise.model.Order> updateOrder(@PathVariable("orderId") long id,@RequestBody OrderUpdateInformation orderUpdateInformation){
         if (orderUpdateInformation.getStatus() == null){
             throw new WrongParameterException(errorMessage);
         }
-        updateOrderService.updateOrder(orderUpdateInformation, id);
-        return ResponseEntity.ok("Order status update");
+        Order orderUpdated = updateOrderService.updateOrder(orderUpdateInformation, id);
+        com.sacks.codeexercise.model.Order orderResponse= new com.sacks.codeexercise.model.Order();
+
+        orderResponse.setOrderId(orderUpdated.getOrderId());
+        orderResponse.setOrderStatus(orderUpdated.getOrderStatus().getStatus());
+        orderResponse.setAmount(orderUpdated.getAmount());
+        orderResponse.setBuyer(orderUpdated.getBuyer().getUsername());
+        orderResponse.setProducts(orderUpdated.getProducts());
+        orderResponse.setEstimatedDays(orderUpdated.getEstimatedDays());
+
+        return ResponseEntity.ok(orderResponse);
     }
 }

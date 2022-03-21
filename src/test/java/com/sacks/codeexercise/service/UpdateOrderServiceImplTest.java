@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import com.sacks.codeexercise.error.IncorrectUpdateStatusException;
 import com.sacks.codeexercise.error.NotFoundOrderErrorException;
+import com.sacks.codeexercise.model.OrderUpdateInformation;
 import com.sacks.codeexercise.model.entities.Customer;
 import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.OrderStatusHistory;
-import com.sacks.codeexercise.model.entities.OrderUpdateInformation;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.OrderStatusHistoryRepository;
 import com.sacks.codeexercise.repository.OrderStatusRepository;

@@ -55,4 +55,12 @@ public class OrderStatus {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
 }

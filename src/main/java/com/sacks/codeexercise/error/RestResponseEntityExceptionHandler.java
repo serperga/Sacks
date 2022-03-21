@@ -26,7 +26,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     @ExceptionHandler(value
-        = { WrongParameterException.class })
+        = { WrongParameterException.class, IncorrectUpdateStatusException.class })
     protected ResponseEntity<Object> handleNotStatusOrderInformation(
         RuntimeException ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -35,5 +35,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+
 
 }

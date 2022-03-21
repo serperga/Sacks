@@ -6,7 +6,7 @@ import java.util.List;
 import com.sacks.codeexercise.model.entities.Product;
 
 
-public class Order {
+public class OrderUpdateResponse {
 
     private long orderId;
     private int estimatedDays;
@@ -15,9 +15,9 @@ public class Order {
     private String orderStatus;
     private List<Product> products = new ArrayList<>();
 
-    public Order(){}
+    public OrderUpdateResponse(){}
 
-    public Order(long orderId, int estimatedDays, Double amount, String buyer, String orderStatus,
+    public OrderUpdateResponse(long orderId, int estimatedDays, Double amount, String buyer, String orderStatus,
         List<Product> products) {
         this.orderId = orderId;
         this.estimatedDays = estimatedDays;

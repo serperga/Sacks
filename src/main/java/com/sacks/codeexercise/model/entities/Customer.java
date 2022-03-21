@@ -10,13 +10,18 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "buyers")
 public class Customer {
 
     @Id
+    @ApiModelProperty(notes = "customer",name="username",required=true,value="test name")
     private String username;
+    @ApiModelProperty(notes = "Current amount in Wallet for the user",name="currentAmountInWallet",required=true,value="2000.0")
     private Double currentAmountInWallet;
+    @ApiModelProperty(notes = "Initial amount in Wallet for the user",name="initialAmountInWallet",required=true,value="2000.0")
     private Double initialAmountInWallet;
 
     @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY,

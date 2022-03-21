@@ -5,27 +5,36 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "order_status_history")
 @IdClass(OrderStatusHistoryKey.class)
 public class OrderStatusHistory {
 
     @Id
+    @ApiModelProperty(notes = "order identifier",name="orderId",required=true,value="1")
     private long orderId;
+    @ApiModelProperty(notes = "status identifier",name="statusId",required=true,value="1")
     @Id
     private int statusId;
 
+    @ApiModelProperty(notes = "customer",name="username",required=true,value="test user")
     private String username;
+    @ApiModelProperty(notes = "status completed in days",name="completedStatusInDays",required=false,value="1")
     private int completedStatusInDays;
+    @ApiModelProperty(notes = "price of the order",name="orderAmount",required=false,value="150.35")
+    private double orderAmount;
 
     public OrderStatusHistory() {
     }
 
-    public OrderStatusHistory(long orderId, int statusId, String username, int completedStatusInDays) {
+    public OrderStatusHistory(long orderId, int statusId, String username, int completedStatusInDays, Double orderAmount) {
         this.orderId = orderId;
         this.statusId = statusId;
         this.username = username;
         this.completedStatusInDays = completedStatusInDays;
+        this.orderAmount = orderAmount;
     }
 
     public long getOrderId() {
@@ -58,5 +67,13 @@ public class OrderStatusHistory {
 
     public void setCompletedStatusInDays(int completedStatusInDays) {
         this.completedStatusInDays = completedStatusInDays;
+    }
+
+    public double getOrderAmount() {
+        return orderAmount;
+    }
+
+    public void setOrderAmount(double orderAmount) {
+        this.orderAmount = orderAmount;
     }
 }

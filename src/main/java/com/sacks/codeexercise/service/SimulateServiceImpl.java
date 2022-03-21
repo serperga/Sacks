@@ -3,10 +3,8 @@ package com.sacks.codeexercise.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,8 +109,6 @@ public class SimulateServiceImpl implements SimulateService {
     private List<OrderStatus> createOrderStatusInDatabase(){
 
         List<OrderStatus> orderStatuses = new ArrayList<>();
-
-        Set<OrderStatusHistory> orderStatusHistorySet = new HashSet<>();
 
         OrderStatus statusOrdered = new OrderStatus(0,"Ordered");
         orderStatuses.add(statusOrdered);

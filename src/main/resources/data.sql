@@ -35,12 +35,13 @@ CREATE TABLE order_status_history (
   status_id INT NOT NULL,
   completed_status_in_days INT,
   username VARCHAR(250) NOT NULL,
+  amount DECIMAL,
   PRIMARY KEY (order_id, status_id)
 );
 
 CREATE TABLE order_products (
-  product_id INT,
-  order_id INT,
+  product_id INT NOT NULL,
+  order_id INT NOT NULL,
   PRIMARY KEY (order_id, product_id)
 );
 

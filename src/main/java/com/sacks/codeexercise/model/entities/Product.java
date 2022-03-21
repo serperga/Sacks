@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "products")
 public class Product {
@@ -23,9 +25,13 @@ public class Product {
         name = "seq_products",
         allocationSize = 1
     )
+    @ApiModelProperty(notes = "product identifier",name="productId",required=true,value="15")
     private long productId;
+    @ApiModelProperty(notes = "name of the product",name="name",required=true,value="example")
     private String name;
+    @ApiModelProperty(notes = "quantity of the product",name="quantity",required=true,value="1")
     private int quantity;
+    @ApiModelProperty(notes = "price of the product",name="orderAmount",required=true,value="150.35")
     private Double price;
 
     @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)

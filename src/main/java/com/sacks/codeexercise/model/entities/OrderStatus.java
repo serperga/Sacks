@@ -10,12 +10,16 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "order_status")
 public class OrderStatus {
 
     @Id
+    @ApiModelProperty(notes = "status identifier",name="statusId",required=true,value="1")
     private int statusId;
+    @ApiModelProperty(notes = "status of the order (Delivered,Ordered, Cancelled, ...)",name="status",required=true,value="1")
     private String status;
 
     @OneToMany(mappedBy = "orderStatus", fetch = FetchType.LAZY,

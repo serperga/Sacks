@@ -126,6 +126,8 @@ public class SimulateServiceImpl implements SimulateService {
         orderStatuses.add(statusCancelledNotEnoughInventory);
         OrderStatus statusCancelledNotEnoughMoneyInCustomerWallet = new OrderStatus(7,"Cancelled. Not Enough money in customer wallet");
         orderStatuses.add(statusCancelledNotEnoughMoneyInCustomerWallet);
+        OrderStatus statusCancelledNotProductsInOrderAfterRefund = new OrderStatus(8,"Cancelled. Not products in order after refund");
+        orderStatuses.add(statusCancelledNotProductsInOrderAfterRefund);
 
         orderStatusRepository.saveAll(orderStatuses);
         return orderStatuses;

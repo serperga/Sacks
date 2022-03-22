@@ -12,7 +12,10 @@ import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.OrderStatus;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.CustomerRepository;
+import com.sacks.codeexercise.repository.OrderStatusHistoryRepository;
+import com.sacks.codeexercise.repository.OrderStatusRepository;
 import com.sacks.codeexercise.repository.OrdersRepository;
+import com.sacks.codeexercise.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,12 +35,19 @@ class ProductRefundServiceImplTest {
     private OrdersRepository ordersRepository;
     @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private OrderStatusHistoryRepository orderStatusHistoryRepository;
+    @Mock
+    private ProductRepository productRepository;
+    @Mock
+    private OrderStatusRepository orderStatusRepository;
 
     private ProductRefundServiceImpl productRefundService;
 
     @BeforeEach
     void init(){
-        productRefundService = new ProductRefundServiceImpl(ordersRepository, customerRepository);
+        productRefundService = new ProductRefundServiceImpl(ordersRepository, customerRepository,
+            orderStatusHistoryRepository, productRepository, orderStatusRepository);
     }
 
     @Test
@@ -77,10 +87,12 @@ class ProductRefundServiceImplTest {
         Order orderRefunded = createOrderRefunded();
         Customer customer = createCustomer();
         Customer customerRefunded = createCustomerRefunded();
+        Product productRefunded = createProductRefunded();
         lenient().when(ordersRepository.findOrderByOrderId(1L)).thenReturn(order);
         lenient().when(customerRepository.findByUsername("customer1")).thenReturn(customer);
         lenient().when(customerRepository.save(any())).thenReturn(customerRefunded);
         lenient().when(ordersRepository.save(any())).thenReturn(orderRefunded);
+        lenient().when(productRepository.save(productRefunded)).thenReturn(productRefunded);
 
         final OrderRefundInformation orderRefundInformation = productRefundService.returnProductAndGetRefund(1L, 1L);
 
@@ -133,6 +145,7 @@ class ProductRefundServiceImplTest {
 
         return order;
     }
+
     private List<Product> createProducts(){
         Product product1 = new Product();
         product1.setProductId(1);
@@ -189,5 +202,15 @@ class ProductRefundServiceImplTest {
         products.add(product);
 
         return products;
+    }
+
+    private Product createProductRefunded() {
+        Product product = new Product();
+        product.setProductId(1);
+        product.setQuantity(10);
+        product.setPrice(100.0);
+        product.setName("Product 1");
+
+        return product;
     }
 }

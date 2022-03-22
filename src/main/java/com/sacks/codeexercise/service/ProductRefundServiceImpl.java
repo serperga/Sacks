@@ -11,24 +11,39 @@ import com.sacks.codeexercise.error.NotFoundOrderErrorException;
 import com.sacks.codeexercise.error.ProductNotFoundException;
 import com.sacks.codeexercise.model.OrderRefundInformation;
 import com.sacks.codeexercise.model.ProductInformation;
-import com.sacks.codeexercise.model.ProductStockInformation;
 import com.sacks.codeexercise.model.entities.Customer;
 import com.sacks.codeexercise.model.entities.Order;
+import com.sacks.codeexercise.model.entities.OrderStatus;
+import com.sacks.codeexercise.model.entities.OrderStatusHistory;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.repository.CustomerRepository;
+import com.sacks.codeexercise.repository.OrderStatusHistoryRepository;
+import com.sacks.codeexercise.repository.OrderStatusRepository;
 import com.sacks.codeexercise.repository.OrdersRepository;
+import com.sacks.codeexercise.repository.ProductRepository;
 
 @Service
 public class ProductRefundServiceImpl implements ProductRefundService {
 
     private final OrdersRepository ordersRepository;
     private final CustomerRepository customerRepository;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final ProductRepository productRepository;
+    private final OrderStatusRepository orderStatusRepository;
+
+    private static final int ORDER_CANCELLED_NO_PRODUCT_IN_ORDER_STATUS = 8;
 
     @Autowired
     public ProductRefundServiceImpl(OrdersRepository ordersRepository,
-        CustomerRepository customerRepository) {
+        CustomerRepository customerRepository,
+        OrderStatusHistoryRepository orderStatusHistoryRepository,
+        ProductRepository productRepository,
+        OrderStatusRepository orderStatusRepository) {
         this.ordersRepository = ordersRepository;
         this.customerRepository = customerRepository;
+        this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+        this.productRepository = productRepository;
+        this.orderStatusRepository = orderStatusRepository;
     }
 
     @Override
@@ -44,17 +59,40 @@ public class ProductRefundServiceImpl implements ProductRefundService {
                 findFirst();
             if (matchingProduct.isPresent()){
                 Product productToRefund = matchingProduct.get();
+                int quantityAfterRefund = productToRefund.getQuantity() + 1;
+                productToRefund.setQuantity(quantityAfterRefund);
+                productRepository.save(productToRefund);
                 Customer customerToBeRefunded = customerRepository.findByUsername(order.get().getBuyer().getUsername());
                 Double amountToRefund = productToRefund.getPrice();
-                Double orderAmountAfterRefund = customerToBeRefunded.getCurrentAmountInWallet() + amountToRefund;
-                customerToBeRefunded.setCurrentAmountInWallet(orderAmountAfterRefund);
+                Double orderAmountAfterRefund = orderToRefund.getAmount() - amountToRefund;
+                Double customerWalletAfterRefund = customerToBeRefunded.getCurrentAmountInWallet() + amountToRefund;
+                customerToBeRefunded.setCurrentAmountInWallet(customerWalletAfterRefund);
                 customerToBeRefunded = customerRepository.save(customerToBeRefunded);
                 orderToRefund.setBuyer(customerToBeRefunded);
                 orderToRefund.setAmount(orderAmountAfterRefund);
                 productListInOrder.removeIf(product -> product.getProductId() == productId);
-                orderToRefund.setProducts(productListInOrder);
-                orderToRefund = ordersRepository.save(orderToRefund);
+                if(!productListInOrder.isEmpty()) {
+                    orderToRefund.setProducts(productListInOrder);
+                    orderToRefund = ordersRepository.save(orderToRefund);
+                } else{
+                    OrderStatusHistory orderStatusHistory = new OrderStatusHistory();
+                    orderStatusHistory.setOrderId(orderToRefund.getOrderId());
+                    orderStatusHistory.setCompletedStatusInDays(0);
+                    orderStatusHistory.setUsername(orderToRefund.getBuyer().getUsername());
+                    orderStatusHistory.setOrderAmount(0);
+                    orderStatusHistory.setStatusId(ORDER_CANCELLED_NO_PRODUCT_IN_ORDER_STATUS);
 
+                    final Optional<OrderStatus> orderStatus = orderStatusRepository
+                        .findOrderStatusByStatusId(ORDER_CANCELLED_NO_PRODUCT_IN_ORDER_STATUS);
+                    if (orderStatus.isPresent()){
+                        orderToRefund.setOrderStatus(orderStatus.get());
+                    }
+
+                    orderStatusHistoryRepository.save(orderStatusHistory);
+                    ordersRepository.delete(orderToRefund);
+
+                    orderRefundInformation = createOrderRefundedInformation(orderRefundInformation,orderToRefund,new ArrayList<Product>());
+                }
                 orderRefundInformation = createOrderRefundedInformation(orderRefundInformation,orderToRefund,productListInOrder);
 
             }else{

@@ -56,7 +56,7 @@ class ProductRefundServiceImplTest {
         lenient().when(ordersRepository.findOrderByOrderId(1L)).thenReturn(order);
 
         Exception exception = assertThrows(ProductNotFoundException.class, () -> {
-            productRefundService.returnProductAndGetRefund(100L,1L);
+            productRefundService.returnProductAndGetRefund(1L,2L);
         });
 
         String expectedMessage = "Product not found in order. Product can not be refunded";

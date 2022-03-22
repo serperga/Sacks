@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class OrderUpdateResponse {
+public class OrderInformation {
 
     private long orderId;
     private int estimatedDays;
@@ -13,9 +13,9 @@ public class OrderUpdateResponse {
     private String orderStatus;
     private List<ProductInformation> products = new ArrayList<ProductInformation>();
 
-    public OrderUpdateResponse(){}
+    public OrderInformation(){}
 
-    public OrderUpdateResponse(long orderId, int estimatedDays, Double amount, String buyer, String orderStatus,
+    public OrderInformation(long orderId, int estimatedDays, Double amount, String buyer, String orderStatus,
         List<ProductInformation> products) {
         this.orderId = orderId;
         this.estimatedDays = estimatedDays;

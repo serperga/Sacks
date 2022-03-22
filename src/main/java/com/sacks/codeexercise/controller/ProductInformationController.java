@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sacks.codeexercise.model.ProductInformation;
 import com.sacks.codeexercise.model.ProductStockInformation;
 import com.sacks.codeexercise.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(value="UpdateOrderController", description="Gives information about products in store (quantity, price, etc ...).")
+@Api(value="ProductInformationController", description="Gives information about products in store (quantity, price, etc ...).")
 @RestController
 public class ProductInformationController {
 

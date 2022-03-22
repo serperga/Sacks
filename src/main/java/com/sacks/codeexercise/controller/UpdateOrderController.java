@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sacks.codeexercise.error.WrongParameterException;
 import com.sacks.codeexercise.model.OrderUpdateInformation;
-import com.sacks.codeexercise.model.OrderUpdateResponse;
+import com.sacks.codeexercise.model.OrderInformation;
 import com.sacks.codeexercise.model.ProductInformation;
 import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.Product;
@@ -37,18 +37,18 @@ public class UpdateOrderController {
 
     @PutMapping("/orders/{orderId}")
     @ApiOperation("Update an order in the store based in its identifier.")
-    public ResponseEntity<OrderUpdateResponse> updateOrder(@PathVariable("orderId") long id,@RequestBody OrderUpdateInformation orderUpdateInformation){
+    public ResponseEntity<OrderInformation> updateOrder(@PathVariable("orderId") long id,@RequestBody OrderUpdateInformation orderUpdateInformation){
         if (orderUpdateInformation.getStatus() == null){
             throw new WrongParameterException(errorMessage);
         }
         Order orderUpdated = updateOrderService.updateOrder(orderUpdateInformation, id);
-        OrderUpdateResponse orderUpdateResponse = createResponse(orderUpdated);
+        OrderInformation orderInformation = createResponse(orderUpdated);
 
-        return ResponseEntity.ok(orderUpdateResponse);
+        return ResponseEntity.ok(orderInformation);
     }
 
-    private OrderUpdateResponse createResponse(Order orderUpdated){
-        OrderUpdateResponse orderUpdateInformationResponse = new OrderUpdateResponse();
+    private OrderInformation createResponse(Order orderUpdated){
+        OrderInformation orderUpdateInformationResponse = new OrderInformation();
 
         orderUpdateInformationResponse.setOrderId(orderUpdated.getOrderId());
         orderUpdateInformationResponse.setOrderStatus(orderUpdated.getOrderStatus().getStatus());

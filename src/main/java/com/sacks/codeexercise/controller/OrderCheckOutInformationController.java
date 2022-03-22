@@ -25,7 +25,7 @@ public class OrderCheckOutInformationController {
 
     @GetMapping("/orders/{orderId}")
     @ApiOperation("Returns all the checkout information about an order.")
-    public ResponseEntity<OrderInformation> retrieveAllCheckoutInformationAboutAnOrder(@PathVariable("productId") long id){
+    public ResponseEntity<OrderInformation> retrieveAllCheckoutInformationAboutAnOrder(@PathVariable("orderId") long id){
         OrderInformation orderUpdateInformation = orderCheckoutInformationService.retrieveOrderCheckoutInformation(id);
         return ResponseEntity.ok(orderUpdateInformation);
     }

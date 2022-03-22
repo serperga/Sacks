@@ -20,7 +20,7 @@ public class SimulateController {
         this.simulateService = simulateService;
     }
 
-    @ApiOperation(value = "Vrete the database schema and all the information needed for the exercise")
+    @ApiOperation(value = "Create the database schema and all the information needed for the initial store.")
     @PostMapping("/simulate")
     public ResponseEntity<String> simulateSystemCreation() {
         simulateService.simulateSystem();

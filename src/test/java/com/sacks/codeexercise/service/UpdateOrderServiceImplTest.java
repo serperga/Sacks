@@ -29,7 +29,7 @@ import static org.mockito.Mockito.lenient;
 
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateOrderUpdateResponseServiceImplTest {
+public class UpdateOrderServiceImplTest {
 
     @Mock
     private OrdersRepository ordersRepository;

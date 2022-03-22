@@ -18,6 +18,7 @@ import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.service.UpdateOrderService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Api(value="UpdateOrderController", description="Update status and information of an existing order.The only value that can be changed in the order is the status.To be a "
     + "valid status has to be the next status on the order process sequence. This sequence is Ordered -> Sent to warehouse -> Packaged -> Carrier picked up "
@@ -35,6 +36,7 @@ public class UpdateOrderController {
     }
 
     @PutMapping("/orders/{orderId}")
+    @ApiOperation("Update an order in the store based in its identifier.")
     public ResponseEntity<OrderUpdateResponse> updateOrder(@PathVariable("orderId") long id,@RequestBody OrderUpdateInformation orderUpdateInformation){
         if (orderUpdateInformation.getStatus() == null){
             throw new WrongParameterException(errorMessage);

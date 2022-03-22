@@ -10,7 +10,8 @@ import com.sacks.codeexercise.service.ProductRefundService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(value="ProductRefundController", description="Returns a product a customer bought and refund the price of this product to the customer wallet")
+@Api(value="ProductRefundController", description="Returns a product a customer bought and refund the price of this product to the customer wallet. If the "
+    + "order only has one product the order is cancelled and the status of the order indicates this.")
 @RestController
 public class ProductRefundController {
 

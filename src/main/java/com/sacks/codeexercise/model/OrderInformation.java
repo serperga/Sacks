@@ -3,14 +3,25 @@ package com.sacks.codeexercise.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.annotations.ApiModelProperty;
+
 
 public class OrderInformation {
 
+    @ApiModelProperty(notes = "order identifier",name="orderId",required=true,value="1")
     private long orderId;
+    @ApiModelProperty(notes = "estimated time to finish this status and go to the next status",name="estimatedDays",required=true,value="1")
     private int estimatedDays;
+    @ApiModelProperty(notes = "total amount to pay for the order",name="amount",required=true,value="150.12")
     private Double amount;
+    @ApiModelProperty(notes = "customer username",name="buyer",required=true,value="customer 1")
     private String buyer;
+    @ApiModelProperty(notes = "order Status. The values are: Ordered, ent to Warehouse, Packaged, Carrier picked up,"
+        + " Out for delivery, Delivered, Cancelled. Not Enough stock, Cancelled. Not Enough money in customer wallet, "
+        + "Cancelled. Not products in order after refund"
+        ,name="orderStatus",required=true,value="Ordered")
     private String orderStatus;
+    @ApiModelProperty(notes = "List of products in the order",name="products",required=true)
     private List<ProductInformation> products = new ArrayList<ProductInformation>();
 
     public OrderInformation(){}

@@ -1,24 +1,28 @@
 package com.sacks.codeexercise.model;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class ProductInformation {
 
-    String ProductName;
+    @ApiModelProperty(notes = "product name",name="productName",required=true,value="Product 1")
+    String productName;
+    @ApiModelProperty(notes = "product price",name="price",required=true,value="15.0")
     Double price;
 
     public ProductInformation() {
     }
 
     public ProductInformation(String productName, Double price) {
-        ProductName = productName;
+        this.productName = productName;
         this.price = price;
     }
 
     public String getProductName() {
-        return ProductName;
+        return productName;
     }
 
     public void setProductName(String productName) {
-        ProductName = productName;
+        this.productName = productName;
     }
 
     public Double getPrice() {

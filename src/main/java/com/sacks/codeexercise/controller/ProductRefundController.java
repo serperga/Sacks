@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sacks.codeexercise.model.OrderRefundInformation;
+import com.sacks.codeexercise.service.ProductRefundService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -13,10 +14,17 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 public class ProductRefundController {
 
+    private ProductRefundService productRefundService;
+
+    public ProductRefundController(ProductRefundService productRefundService) {
+        this.productRefundService = productRefundService;
+    }
+
     @PutMapping("/orders/{orderId}/products/{productId}/refund")
     @ApiOperation("Refund a customer a product returned from the order.")
     public ResponseEntity<OrderRefundInformation> refundProductToCustomer(@PathVariable("orderId") long orderId,@PathVariable("productId") long productId){
-        return ResponseEntity.ok(null);
+        OrderRefundInformation orderRefundInformation = productRefundService.returnProductAndGetRefund(orderId,productId);
+        return ResponseEntity.ok(orderRefundInformation);
     }
 
 }

@@ -1,5 +1,8 @@
 package com.sacks.codeexercise.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sacks.codeexercise.error.WrongParameterException;
 import com.sacks.codeexercise.model.OrderUpdateInformation;
 import com.sacks.codeexercise.model.OrderUpdateResponse;
+import com.sacks.codeexercise.model.ProductInformation;
 import com.sacks.codeexercise.model.entities.Order;
+import com.sacks.codeexercise.model.entities.Product;
 import com.sacks.codeexercise.service.UpdateOrderService;
 import io.swagger.annotations.Api;
 
@@ -35,15 +40,30 @@ public class UpdateOrderController {
             throw new WrongParameterException(errorMessage);
         }
         Order orderUpdated = updateOrderService.updateOrder(orderUpdateInformation, id);
-        OrderUpdateResponse orderUpdateResponseResponse = new OrderUpdateResponse();
+        OrderUpdateResponse orderUpdateResponse = createResponse(orderUpdated);
 
-        orderUpdateResponseResponse.setOrderId(orderUpdated.getOrderId());
-        orderUpdateResponseResponse.setOrderStatus(orderUpdated.getOrderStatus().getStatus());
-        orderUpdateResponseResponse.setAmount(orderUpdated.getAmount());
-        orderUpdateResponseResponse.setBuyer(orderUpdated.getBuyer().getUsername());
-        orderUpdateResponseResponse.setProducts(orderUpdated.getProducts());
-        orderUpdateResponseResponse.setEstimatedDays(orderUpdated.getEstimatedDays());
+        return ResponseEntity.ok(orderUpdateResponse);
+    }
 
-        return ResponseEntity.ok(orderUpdateResponseResponse);
+    private OrderUpdateResponse createResponse(Order orderUpdated){
+        OrderUpdateResponse orderUpdateInformationResponse = new OrderUpdateResponse();
+
+        orderUpdateInformationResponse.setOrderId(orderUpdated.getOrderId());
+        orderUpdateInformationResponse.setOrderStatus(orderUpdated.getOrderStatus().getStatus());
+        orderUpdateInformationResponse.setAmount(orderUpdated.getAmount());
+        orderUpdateInformationResponse.setBuyer(orderUpdated.getBuyer().getUsername());
+        orderUpdateInformationResponse.setEstimatedDays(orderUpdated.getEstimatedDays());
+
+        List<Product> productsInOrder = orderUpdated.getProducts();
+        List<ProductInformation> productInformationList = new ArrayList<>();
+
+        productsInOrder.forEach(product -> {
+            ProductInformation productInformation = new ProductInformation(product.getName(),product.getPrice());
+            productInformationList.add(productInformation);
+        });
+
+        orderUpdateInformationResponse.setProducts(productInformationList);
+
+        return orderUpdateInformationResponse;
     }
 }

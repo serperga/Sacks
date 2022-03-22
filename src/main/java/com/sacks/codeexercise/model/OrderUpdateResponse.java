@@ -3,8 +3,6 @@ package com.sacks.codeexercise.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sacks.codeexercise.model.entities.Product;
-
 
 public class OrderUpdateResponse {
 
@@ -13,12 +11,12 @@ public class OrderUpdateResponse {
     private Double amount;
     private String buyer;
     private String orderStatus;
-    private List<Product> products = new ArrayList<>();
+    private List<ProductInformation> products = new ArrayList<ProductInformation>();
 
     public OrderUpdateResponse(){}
 
     public OrderUpdateResponse(long orderId, int estimatedDays, Double amount, String buyer, String orderStatus,
-        List<Product> products) {
+        List<ProductInformation> products) {
         this.orderId = orderId;
         this.estimatedDays = estimatedDays;
         this.amount = amount;
@@ -67,11 +65,11 @@ public class OrderUpdateResponse {
         this.orderStatus = orderStatus;
     }
 
-    public List<Product> getProducts() {
+    public List<ProductInformation> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<ProductInformation> products) {
         this.products = products;
     }
 }

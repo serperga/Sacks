@@ -60,7 +60,7 @@ public class Order {
         inverseJoinColumns = {
             @JoinColumn(name = "product_id", nullable = false, updatable = false)})
     @ApiModelProperty(notes = "Products ordered",name="products",required=true,value="")
-    private List<Product> products = new ArrayList<>();
+    private List<Product> products = new ArrayList<Product>();
 
     public Order(){}
 

@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value
-        = { NotFoundOrderErrorException.class, ProductNotFoundException.class })
+        = { NotFoundOrderErrorException.class, ProductNotFoundException.class, CustomerNotFoundException.class })
     protected ResponseEntity<Object> handleConflict(
         RuntimeException ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();

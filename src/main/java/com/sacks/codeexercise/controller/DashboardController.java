@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.io.InputStreamResource;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sacks.codeexercise.model.DashboardInformation;
 import com.sacks.codeexercise.service.DashboardService;
 import io.swagger.annotations.Api;
 import org.apache.commons.csv.CSVFormat;

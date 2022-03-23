@@ -213,9 +213,6 @@ public class SimulateServiceImpl implements SimulateService {
         order.setCompletedStatusInDays(0);
         order = orderStatusHistoryRepository.save(order);
 
-        //remove order from Orders Table
-        orderRepository.delete(orderToClose);
-
         return order;
     }
 

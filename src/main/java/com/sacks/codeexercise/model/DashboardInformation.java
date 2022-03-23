@@ -3,26 +3,29 @@ package com.sacks.codeexercise.model;
 public class DashboardInformation {
 
     private String customer;
-    private Double initialAmountInWallet;
-    private Double currentAmountInWallet;
-    private Long orderID;
+    private String initialAmountInWallet;
+    private String currentAmountInWallet;
+    private String orderID;
     private String status;
-    private int daysToCompleteOrderedStatus;
-    private int daysToCompleteSentToWareHouseStatus;
-    private int daysToCompleteCarrierPickedUpStatus;
-    private int daysToCompleteOutForDeliveryStatus;
+    private String productsInOrder;
+    private String daysToCompleteOrderedStatus;
+    private String daysToCompleteSentToWareHouseStatus;
+    private String daysToCompleteCarrierPickedUpStatus;
+    private String daysToCompleteOutForDeliveryStatus;
 
     public DashboardInformation() {
     }
 
-    public DashboardInformation(String customer, Double initialAmountInWallet, Double currentAmountInWallet,
-        Long orderID, String status, int daysToCompleteOrderedStatus, int daysToCompleteSentToWareHouseStatus,
-        int daysToCompleteCarrierPickedUpStatus, int daysToCompleteOutForDeliveryStatus) {
+    public DashboardInformation(String customer, String initialAmountInWallet, String currentAmountInWallet,
+        String orderID, String status, String productsInOrder, String daysToCompleteOrderedStatus,
+        String daysToCompleteSentToWareHouseStatus, String daysToCompleteCarrierPickedUpStatus,
+        String daysToCompleteOutForDeliveryStatus) {
         this.customer = customer;
         this.initialAmountInWallet = initialAmountInWallet;
         this.currentAmountInWallet = currentAmountInWallet;
         this.orderID = orderID;
         this.status = status;
+        this.productsInOrder = productsInOrder;
         this.daysToCompleteOrderedStatus = daysToCompleteOrderedStatus;
         this.daysToCompleteSentToWareHouseStatus = daysToCompleteSentToWareHouseStatus;
         this.daysToCompleteCarrierPickedUpStatus = daysToCompleteCarrierPickedUpStatus;
@@ -37,27 +40,27 @@ public class DashboardInformation {
         this.customer = customer;
     }
 
-    public Double getInitialAmountInWallet() {
+    public String getInitialAmountInWallet() {
         return initialAmountInWallet;
     }
 
-    public void setInitialAmountInWallet(Double initialAmountInWallet) {
+    public void setInitialAmountInWallet(String initialAmountInWallet) {
         this.initialAmountInWallet = initialAmountInWallet;
     }
 
-    public Double getCurrentAmountInWallet() {
+    public String getCurrentAmountInWallet() {
         return currentAmountInWallet;
     }
 
-    public void setCurrentAmountInWallet(Double currentAmountInWallet) {
+    public void setCurrentAmountInWallet(String currentAmountInWallet) {
         this.currentAmountInWallet = currentAmountInWallet;
     }
 
-    public Long getOrderID() {
+    public String getOrderID() {
         return orderID;
     }
 
-    public void setOrderID(Long orderID) {
+    public void setOrderID(String orderID) {
         this.orderID = orderID;
     }
 
@@ -69,35 +72,43 @@ public class DashboardInformation {
         this.status = status;
     }
 
-    public int getDaysToCompleteOrderedStatus() {
+    public String getProductsInOrder() {
+        return productsInOrder;
+    }
+
+    public void setProductsInOrder(String productsInOrder) {
+        this.productsInOrder = productsInOrder;
+    }
+
+    public String getDaysToCompleteOrderedStatus() {
         return daysToCompleteOrderedStatus;
     }
 
-    public void setDaysToCompleteOrderedStatus(int daysToCompleteOrderedStatus) {
+    public void setDaysToCompleteOrderedStatus(String daysToCompleteOrderedStatus) {
         this.daysToCompleteOrderedStatus = daysToCompleteOrderedStatus;
     }
 
-    public int getDaysToCompleteSentToWareHouseStatus() {
+    public String getDaysToCompleteSentToWareHouseStatus() {
         return daysToCompleteSentToWareHouseStatus;
     }
 
-    public void setDaysToCompleteSentToWareHouseStatus(int daysToCompleteSentToWareHouseStatus) {
+    public void setDaysToCompleteSentToWareHouseStatus(String daysToCompleteSentToWareHouseStatus) {
         this.daysToCompleteSentToWareHouseStatus = daysToCompleteSentToWareHouseStatus;
     }
 
-    public int getDaysToCompleteCarrierPickedUpStatus() {
+    public String getDaysToCompleteCarrierPickedUpStatus() {
         return daysToCompleteCarrierPickedUpStatus;
     }
 
-    public void setDaysToCompleteCarrierPickedUpStatus(int daysToCompleteCarrierPickedUpStatus) {
+    public void setDaysToCompleteCarrierPickedUpStatus(String daysToCompleteCarrierPickedUpStatus) {
         this.daysToCompleteCarrierPickedUpStatus = daysToCompleteCarrierPickedUpStatus;
     }
 
-    public int getDaysToCompleteOutForDeliveryStatus() {
+    public String getDaysToCompleteOutForDeliveryStatus() {
         return daysToCompleteOutForDeliveryStatus;
     }
 
-    public void setDaysToCompleteOutForDeliveryStatus(int daysToCompleteOutForDeliveryStatus) {
+    public void setDaysToCompleteOutForDeliveryStatus(String daysToCompleteOutForDeliveryStatus) {
         this.daysToCompleteOutForDeliveryStatus = daysToCompleteOutForDeliveryStatus;
     }
 }

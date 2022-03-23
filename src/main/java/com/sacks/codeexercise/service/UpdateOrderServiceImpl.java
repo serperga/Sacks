@@ -1,7 +1,5 @@
 package com.sacks.codeexercise.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -69,7 +67,6 @@ public class UpdateOrderServiceImpl implements UpdateOrderService {
                     orderStatusHistory.setStatusId(ORDER_DELIVERED_STATUS);
                     orderStatusHistory.setCompletedStatusInDays(0);
                     orderStatusHistoryRepository.save(orderStatusHistory);
-                    orderRepository.delete(orderToUpdate);
                 } else {
                     OrderStatus orderStatus = orderStatusToUpdate.get();
                     orderToUpdate.setOrderStatus(orderStatus);

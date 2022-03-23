@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sacks.codeexercise.model.DashboardInformation;
+import com.sacks.codeexercise.service.DashboardService;
 import io.swagger.annotations.Api;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -23,13 +25,18 @@ import org.apache.commons.csv.CSVPrinter;
 @RestController
 public class DashboardController {
 
+    private final DashboardService dashboardService;
+
+    public DashboardController(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
+
     @GetMapping(value = "/customers/dashboard", produces = "text/csv")
     public ResponseEntity<Resource> getDashboard(){
+        List<List<String>> dashboardForUser = dashboardService.createDashboardForUser();
         String[] csvHeader = {
             "Customer", "Initial Amount in wallet", "Current Amount in Wallet","Order Identifier", "Order Status", "Products Ordered","Ordered","Sent to Warehouse", "Packaged", "Carrier picked up","Out for delivery"
         };
-
-        List<List<String>> csvBody = new ArrayList<>();
 
         ByteArrayInputStream byteArrayOutputStream;
 
@@ -43,7 +50,7 @@ public class DashboardController {
             );
         ) {
             // populating the CSV content
-            for (List<String> record : csvBody)
+            for (List<String> record : dashboardForUser)
                 csvPrinter.printRecord(record);
 
             // writing the underlying stream

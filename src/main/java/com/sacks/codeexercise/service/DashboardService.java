@@ -1,6 +1,10 @@
 package com.sacks.codeexercise.service;
 
+import java.util.List;
+
+import com.sacks.codeexercise.model.DashboardInformation;
+
 public interface DashboardService {
-    void createDashboardForUser(String username);
+    List<List<String>> createDashboardForUser();
 
 }

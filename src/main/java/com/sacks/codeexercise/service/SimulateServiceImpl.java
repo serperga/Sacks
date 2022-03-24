@@ -65,7 +65,7 @@ public class SimulateServiceImpl implements SimulateService {
     private static final int CANCELLED_STATUS_NOT_ENOUGH_STOCK = 6;
     private static final int CANCELLED_STATUS_NOT_ENOUGH_MONEY_IN_CUSTOMER_WALLET = 7;
 
-    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
 
     @Autowired

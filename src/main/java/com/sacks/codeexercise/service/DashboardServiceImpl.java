@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -51,18 +50,42 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<List<String>> createDashboardForUser() {
+    public List<List<String>> createDashboardForUser(String username) {
+
+        Customer customer = customerRepository.findByUsername(username);
+        List<List<String>> dashboardInformationList = new ArrayList<>();
+
+        createDashboardInformationForCustomer(customer,dashboardInformationList);
+
+        createMaxMinAvgSectionDorDashboard(dashboardInformationList);
+
+        return dashboardInformationList;
+
+    }
+
+    @Override
+    public List<List<String>> createDashboardForUsers() {
         List<Customer> customers = getAllCustomers();
         statusesMap = createStatusesMap();
         List<List<String>> dashboardInformationList = new ArrayList<>();
 
         customers.forEach(customer -> {
-            addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_ENOUGH_STOCK_STATUS);
-            addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_ENOUGH_AMOUNT_IN_WALLET_STATUS);
-            addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_PRODUCTS_IN_ORDER_AFTER_REFUND_STATUS);
-            addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,ORDER_DELIVERED_STATUS);
+            createDashboardInformationForCustomer(customer,dashboardInformationList);
         });
 
+        createMaxMinAvgSectionDorDashboard(dashboardInformationList);
+
+        return dashboardInformationList;
+    }
+
+    private void createDashboardInformationForCustomer(Customer customer,List<List<String>> dashboardInformationList){
+        addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_ENOUGH_STOCK_STATUS);
+        addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_ENOUGH_AMOUNT_IN_WALLET_STATUS);
+        addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,CANCELLED_NOT_PRODUCTS_IN_ORDER_AFTER_REFUND_STATUS);
+        addOrdersForCustomerToDashboardInformation(customer,dashboardInformationList,ORDER_DELIVERED_STATUS);
+    }
+
+    private void createMaxMinAvgSectionDorDashboard(List<List<String>> dashboardInformationList){
         addBlankLinesToDashboardData(dashboardInformationList);
         addBlankLinesToDashboardData(dashboardInformationList);
         addBlankLinesToDashboardData(dashboardInformationList);
@@ -72,9 +95,6 @@ public class DashboardServiceImpl implements DashboardService {
         addMaximumMinimumAndAverageOfDaysForEachStatusToDashboardInformation(PACKAGED_STATUS,dashboardInformationList);
         addMaximumMinimumAndAverageOfDaysForEachStatusToDashboardInformation(PICKED_BY_CARRIER_STATUS,dashboardInformationList);
         addMaximumMinimumAndAverageOfDaysForEachStatusToDashboardInformation(OUT_FOR_DELIVERY_STATUS,dashboardInformationList);
-
-        return dashboardInformationList;
-
     }
 
     private List<Customer> getAllCustomers(){
@@ -164,20 +184,20 @@ public class DashboardServiceImpl implements DashboardService {
         dashboardInformationList.add(blankLine);
     }
     private void addMaximumMinimumAndAverageOfDaysForEachStatusToDashboardInformation(String status,List<List<String>> dashboardInformationList){
-        int statusToCalculate = statusesMap.get(status);
+        int statusToCalculate = statusesMap.get(status).intValue();
         Optional<List<OrderStatusHistory>> orderStatusHistoryList = orderStatusHistoryRepository.findOrderStatusHistoryByStatusId(statusToCalculate);
         List<OrderStatusHistory> orderStatusHistories = orderStatusHistoryList.get();
 
-        OptionalInt min = orderStatusHistories.stream().mapToInt(OrderStatusHistory::getCompletedStatusInDays).min();
-        OptionalInt max = orderStatusHistories.stream().mapToInt(OrderStatusHistory::getCompletedStatusInDays).max();
+        int min = orderStatusHistories.stream().mapToInt(OrderStatusHistory::getCompletedStatusInDays).min().orElse(0);
+        int max = orderStatusHistories.stream().mapToInt(OrderStatusHistory::getCompletedStatusInDays).max().orElse(0);
         double intAverage = orderStatusHistories.stream()
             .mapToInt(OrderStatusHistory::getCompletedStatusInDays)
             .average()
             .orElse(0.0);
 
         List<String> data = new ArrayList<>();
-        String minTitle = "minimum days for " + status + "Status is " + min.getAsInt() + "days";
-        String maxTitle = "maximum days for " + status + "Status is " + max.getAsInt() + "days";
+        String minTitle = "minimum days for " + status + "Status is " + min + "days";
+        String maxTitle = "maximum days for " + status + "Status is " + max + "days";
         String avgTitle = "average days for " + status + "Status is " + intAverage + "days";
         data.add(minTitle);
         data.add(maxTitle);

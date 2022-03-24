@@ -40,7 +40,7 @@ public class DashboardController {
 
         InputStreamResource fileInputStream = new InputStreamResource(byteArrayOutputStream);
 
-        String csvFileName = "customersDashboard.csv";
+        String csvFileName = username + "Dashboard.csv";
 
         // setting HTTP headers
         HttpHeaders headers = new HttpHeaders();

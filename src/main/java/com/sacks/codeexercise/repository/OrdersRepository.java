@@ -13,4 +13,7 @@ public interface OrdersRepository extends JpaRepository<Order,Long> {
     @Query(value = "SELECT * FROM ORDERS WHERE status_id = ?1 and username = ?2",
         nativeQuery = true)
     Optional<List<Order>> findOrdersByStatusAndCustomer(int statusId, String username);
+    @Query(value = "SELECT * FROM ORDERS WHERE status_id = ?1",
+        nativeQuery = true)
+    Optional<List<Order>> findOrdersByStatus(int statusId);
 }

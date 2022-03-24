@@ -61,17 +61,21 @@ public class UpdateOrderServiceImpl implements UpdateOrderService {
             }else{
                 OrderStatusHistory orderStatusHistory = createOrderStatusHistory(orderToUpdate);
                 orderStatusHistoryRepository.save(orderStatusHistory);
-                int estimatedProcessDaysForNewStatus = generateRandomIntNumber(1,5);
+
+                int estimatedProcessDaysForNewStatus = 0;
+                if(orderStatusToUpdate.get().getStatusId() != ORDER_DELIVERED_STATUS) {
+                    estimatedProcessDaysForNewStatus = generateRandomIntNumber(1, 6);
+                }
+
+                OrderStatus orderStatus = orderStatusToUpdate.get();
+                orderToUpdate.setOrderStatus(orderStatus);
+                orderUpdated.setEstimatedDays(estimatedProcessDaysForNewStatus);
+                orderUpdated = orderRepository.save(orderToUpdate);
 
                 if(statusToUpdateOrder == ORDER_DELIVERED_STATUS){
                     orderStatusHistory.setStatusId(ORDER_DELIVERED_STATUS);
                     orderStatusHistory.setCompletedStatusInDays(0);
                     orderStatusHistoryRepository.save(orderStatusHistory);
-                } else {
-                    OrderStatus orderStatus = orderStatusToUpdate.get();
-                    orderToUpdate.setOrderStatus(orderStatus);
-                    orderUpdated.setEstimatedDays(estimatedProcessDaysForNewStatus);
-                    orderUpdated = orderRepository.save(orderToUpdate);
                 }
 
             }

@@ -52,6 +52,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<List<String>> createDashboardForUser(String username) {
 
+        statusesMap = createStatusesMap();
         Customer customer = customerRepository.findByUsername(username);
         List<List<String>> dashboardInformationList = new ArrayList<>();
 

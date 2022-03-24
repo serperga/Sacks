@@ -2,14 +2,20 @@ package com.sacks.codeexercise.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sacks.codeexercise.model.OrderUpdateInformation;
 import com.sacks.codeexercise.model.entities.Customer;
 import com.sacks.codeexercise.model.entities.Order;
 import com.sacks.codeexercise.model.entities.OrderStatus;
@@ -30,6 +36,8 @@ public class SimulateServiceImpl implements SimulateService {
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final OrdersRepository orderRepository;
 
+    private final UpdateOrderService updateOrderService;
+
     private static final int NUMBER_OF_CUSTOMERS = 200;
     private static final int NUMBER_OF_PRODUCTS = 20;
 
@@ -43,23 +51,36 @@ public class SimulateServiceImpl implements SimulateService {
     private static final double MAXIMUM_AMOUNT_IN_CUSTOMER_WALLET  = 20000.0;
 
     private static final int MINIMUM_NUMBER_OF_PRODUCT = 1;
-    private static final int MAXIMUM_NUMBER_OF_PRODUCT = 5;
+    private static final int MAXIMUM_NUMBER_OF_PRODUCT = 6;
 
     private static final int MINIMUM_PRODUCT_ID = 1;
     private static final int MAXIMUM_PRODUCT_ID = 20;
 
     private static final int ORDER_CREATED_STATUS = 0;
+    private static final int ORDER_SENT_TO_WAREHOUSE_STATUS = 1;
+    private static final int ORDER_PACKAGED_STATUS = 2;
+    private static final int ORDER_PICKED_BY_CARRIER_STATUS = 3;
+    private static final int ORDER_OUT_FOR_DELIVERY_STATUS = 4;
+    private static final int ORDER_DELIVERED_STATUS = 5;
     private static final int CANCELLED_STATUS_NOT_ENOUGH_STOCK = 6;
     private static final int CANCELLED_STATUS_NOT_ENOUGH_MONEY_IN_CUSTOMER_WALLET = 7;
 
+    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+
     @Autowired
-    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, OrderStatusRepository orderStatusRepository,OrderStatusHistoryRepository orderStatusHistoryRepository,OrdersRepository orderRepository){
+    public SimulateServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository,
+        OrderStatusRepository orderStatusRepository, OrderStatusHistoryRepository orderStatusHistoryRepository,
+        OrdersRepository orderRepository, UpdateOrderService updateOrderService){
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderStatusRepository = orderStatusRepository;
         this.orderStatusHistoryRepository = orderStatusHistoryRepository;
         this.orderRepository = orderRepository;
+        this.updateOrderService = updateOrderService;
     }
+
+
 
     @Override
     public void simulateSystem() {
@@ -67,6 +88,43 @@ public class SimulateServiceImpl implements SimulateService {
         List<Product> products = createProductsInDatabase();
         List<OrderStatus> orderStatuses = createOrderStatusInDatabase();
         createOrdersInDatabase(products, orderStatuses, customers);
+        processOrdersToNextStage(ORDER_CREATED_STATUS, ORDER_SENT_TO_WAREHOUSE_STATUS);
+        processOrdersToNextStage(ORDER_SENT_TO_WAREHOUSE_STATUS, ORDER_PACKAGED_STATUS);
+        processOrdersToNextStage(ORDER_PACKAGED_STATUS, ORDER_PICKED_BY_CARRIER_STATUS);
+        processOrdersToNextStage(ORDER_PICKED_BY_CARRIER_STATUS,ORDER_OUT_FOR_DELIVERY_STATUS);
+        processOrdersToNextStage(ORDER_OUT_FOR_DELIVERY_STATUS,ORDER_DELIVERED_STATUS);
+    }
+
+    private void processOrdersToNextStage(int currentStage,int nextStage){
+        OrderUpdateInformation updateInformation = new OrderUpdateInformation();
+        Optional<Integer> statusToUpdate = Optional.of(nextStage);
+        updateInformation.setStatus(statusToUpdate);
+        Optional<List<Order>> orderList = orderRepository.findOrdersByStatus(currentStage);
+        List<Order> orders = orderList.get();
+        orders.forEach(order -> {
+            simulateStageProcessingForeachOrder(order,updateInformation);
+        });
+    }
+    private void simulateStageProcessingForeachOrder(Order order,OrderUpdateInformation orderUpdateInformation) {
+
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new java.util.Date());
+        System.out.println("Orders update starts at : " + timeStamp);
+        List<Order> orders = orderRepository.findAll();
+
+
+            updateOrderService.updateOrder(orderUpdateInformation,order.getOrderId());
+            int delay = order.getEstimatedDays() * 10;
+            System.out.println("Delay is : " + delay);
+            Runnable runnableTask = () -> {
+                String timeStampUpdate = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new java.util.Date());
+                System.out.println("Order" + order.getOrderId() +" update at : " + timeStampUpdate);
+                updateOrderService.updateOrder(orderUpdateInformation,order.getOrderId());
+            };
+
+            if(order.getOrderStatus().getStatusId() < ORDER_DELIVERED_STATUS){
+                executorService.schedule(runnableTask,delay, TimeUnit.MILLISECONDS);
+            }
+
     }
 
     private List<Customer> createCustomersInDatabase(){
